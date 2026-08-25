@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "updatedAt": "2026-08-25T17:48:00+09:00",
+  "schemaVersion": 2,
+  "updatedAt": "2026-08-25T18:26:00+09:00",
   "profile": {
     "name": "M 的美女之路",
     "subtitle": "把每一次变美，认真存下来。"
@@ -15,19 +15,74 @@
       "capturedAt": null,
       "importedAt": "2026-08-25T17:48:00+09:00",
       "location": "东京",
-      "tags": ["振袖", "和服", "东京", "寺社街景"],
+      "tags": [
+        "振袖",
+        "和服",
+        "东京",
+        "寺社街景"
+      ],
       "note": "离开东京前，再穿一次振袖。原图未包含可读取的 EXIF 拍摄时间，因此保留公开帖时间与导入时间，不冒充拍摄时间。",
       "cover": "assets/photos/2024-03-31-kimono-03.webp",
+      "coverThumb": "assets/photos/2024-03-31-kimono-03.webp",
+      "coverIndex": 2,
       "photos": [
-        {"src":"assets/photos/2024-03-31-kimono-01.webp","alt":"粉色振袖，寺社建筑与五重塔背景","caption":"回望 · 寺社街景"},
-        {"src":"assets/photos/2024-03-31-kimono-02.webp","alt":"粉色振袖，御神签处近景","caption":"御神签 · 侧颜"},
-        {"src":"assets/photos/2024-03-31-kimono-03.webp","alt":"粉色振袖，手提和风包站在御神签处","caption":"振袖全身 · 和风手提包"},
-        {"src":"assets/photos/2024-03-31-kimono-04.webp","alt":"粉色振袖，红色寺社建筑背景","caption":"庭院 · 回眸"},
-        {"src":"assets/photos/2024-03-31-kimono-05.webp","alt":"粉色振袖，狛犬与寺社入口背景","caption":"狛犬前 · 正面全身"}
+        {
+          "src": "assets/photos/2024-03-31-kimono-01.webp",
+          "thumb": "assets/photos/2024-03-31-kimono-01.webp",
+          "width": 800,
+          "height": 1200,
+          "thumbWidth": 360,
+          "thumbHeight": 540,
+          "alt": "粉色振袖，寺社建筑与五重塔背景",
+          "caption": "回望 · 寺社街景"
+        },
+        {
+          "src": "assets/photos/2024-03-31-kimono-02.webp",
+          "thumb": "assets/photos/2024-03-31-kimono-02.webp",
+          "width": 800,
+          "height": 1200,
+          "thumbWidth": 360,
+          "thumbHeight": 540,
+          "alt": "粉色振袖，御神签处近景",
+          "caption": "御神签 · 侧颜"
+        },
+        {
+          "src": "assets/photos/2024-03-31-kimono-03.webp",
+          "thumb": "assets/photos/2024-03-31-kimono-03.webp",
+          "width": 800,
+          "height": 1200,
+          "thumbWidth": 360,
+          "thumbHeight": 540,
+          "alt": "粉色振袖，手提和风包站在御神签处",
+          "caption": "振袖全身 · 和风手提包"
+        },
+        {
+          "src": "assets/photos/2024-03-31-kimono-04.webp",
+          "thumb": "assets/photos/2024-03-31-kimono-04.webp",
+          "width": 800,
+          "height": 1200,
+          "thumbWidth": 360,
+          "thumbHeight": 540,
+          "alt": "粉色振袖，红色寺社建筑背景",
+          "caption": "庭院 · 回眸"
+        },
+        {
+          "src": "assets/photos/2024-03-31-kimono-05.webp",
+          "thumb": "assets/photos/2024-03-31-kimono-05.webp",
+          "width": 800,
+          "height": 1200,
+          "thumbWidth": 360,
+          "thumbHeight": 540,
+          "alt": "粉色振袖，狛犬与寺社入口背景",
+          "caption": "狛犬前 · 正面全身"
+        }
       ],
       "source": {
         "type": "social-post-screenshot",
         "src": "assets/photos/2024-03-31-source-post.webp",
+        "thumb": "assets/photos/2024-03-31-source-post.webp",
+        "width": 800,
+        "height": 870,
         "label": "时间来源截图"
       }
     }
