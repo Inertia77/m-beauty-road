@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7f8" />
+  <meta name="description" content="M 的美女之路——照片时间轴与成长记录" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="美女之路" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="stylesheet" href="assets/app.css" />
+  <title>M 的美女之路</title>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="返回顶部">
+      <span class="brand-mark">M</span>
+      <span><strong>M 的美女之路</strong><small>Beauty Journey</small></span>
+    </a>
+    <button id="installBtn" class="install-btn" hidden>安装 App</button>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow">BEAUTY ARCHIVE · 001</p>
+        <h1>把每一次变美，<br><em>认真存下来。</em></h1>
+        <p class="lede">照片不只是相册。这里会保存造型、时间、地点、备注与来源，让“美女之路”真正变成一条能回看的成长时间线。</p>
+        <div class="hero-actions">
+          <a class="primary" href="#timeline">开始回看</a>
+          <button class="secondary" id="howToInstall">手机安装说明</button>
+        </div>
+      </div>
+      <figure class="hero-card" id="heroCard" aria-label="最新照片"></figure>
+    </section>
+
+    <section class="stats shell" aria-label="统计">
+      <div><strong id="photoCount">—</strong><span>张照片</span></div>
+      <div><strong id="entryCount">—</strong><span>次记录</span></div>
+      <div><strong id="yearCount">—</strong><span>个年份</span></div>
+      <div><strong>PWA</strong><span>可安装</span></div>
+    </section>
+
+    <section class="timeline shell" id="timeline">
+      <div class="section-head">
+        <div><p class="eyebrow">TIMELINE</p><h2>美女时间轴</h2></div>
+        <span class="update-pill" id="updatedAt">最后更新 —</span>
+      </div>
+      <div id="entries" class="entries" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <span>Made for M 的美女之路</span>
+    <span>照片时间与来源分开保存 · 不伪造 EXIF</span>
+  </footer>
+
+  <dialog id="lightbox" class="lightbox">
+    <button id="closeLightbox" class="icon-btn close" aria-label="关闭">×</button>
+    <button id="prevPhoto" class="nav-btn prev" aria-label="上一张">‹</button>
+    <figure>
+      <img id="lightboxImg" alt="" />
+      <figcaption>
+        <strong id="lightboxCaption"></strong>
+        <span id="lightboxMeta"></span>
+      </figcaption>
+    </figure>
+    <button id="nextPhoto" class="nav-btn next" aria-label="下一张">›</button>
+  </dialog>
+
+  <dialog id="installHelp" class="help-dialog">
+    <button id="closeInstallHelp" class="icon-btn close" aria-label="关闭">×</button>
+    <p class="eyebrow">INSTALL</p>
+    <h2>装到手机桌面</h2>
+    <div class="help-grid">
+      <div><strong>iPhone / iPad</strong><p>用 Safari 打开网站 → 点“分享” → “添加到主屏幕”。</p></div>
+      <div><strong>Android / Chrome</strong><p>打开网站后点“安装 App”，或浏览器菜单 → “安装应用”。</p></div>
+    </div>
+  </dialog>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
