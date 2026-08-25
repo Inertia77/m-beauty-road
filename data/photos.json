@@ -29,8 +29,8 @@
         {
           "src": "assets/photos/2024-03-31-kimono-01.webp",
           "thumb": "assets/photos/2024-03-31-kimono-01.webp",
-          "width": 800,
-          "height": 1200,
+          "width": 360,
+          "height": 540,
           "thumbWidth": 360,
           "thumbHeight": 540,
           "alt": "粉色振袖，寺社建筑与五重塔背景",
@@ -39,8 +39,8 @@
         {
           "src": "assets/photos/2024-03-31-kimono-02.webp",
           "thumb": "assets/photos/2024-03-31-kimono-02.webp",
-          "width": 800,
-          "height": 1200,
+          "width": 360,
+          "height": 540,
           "thumbWidth": 360,
           "thumbHeight": 540,
           "alt": "粉色振袖，御神签处近景",
@@ -49,8 +49,8 @@
         {
           "src": "assets/photos/2024-03-31-kimono-03.webp",
           "thumb": "assets/photos/2024-03-31-kimono-03.webp",
-          "width": 800,
-          "height": 1200,
+          "width": 360,
+          "height": 540,
           "thumbWidth": 360,
           "thumbHeight": 540,
           "alt": "粉色振袖，手提和风包站在御神签处",
@@ -59,8 +59,8 @@
         {
           "src": "assets/photos/2024-03-31-kimono-04.webp",
           "thumb": "assets/photos/2024-03-31-kimono-04.webp",
-          "width": 800,
-          "height": 1200,
+          "width": 360,
+          "height": 540,
           "thumbWidth": 360,
           "thumbHeight": 540,
           "alt": "粉色振袖，红色寺社建筑背景",
@@ -69,8 +69,8 @@
         {
           "src": "assets/photos/2024-03-31-kimono-05.webp",
           "thumb": "assets/photos/2024-03-31-kimono-05.webp",
-          "width": 800,
-          "height": 1200,
+          "width": 360,
+          "height": 540,
           "thumbWidth": 360,
           "thumbHeight": 540,
           "alt": "粉色振袖，狛犬与寺社入口背景",
@@ -81,8 +81,8 @@
         "type": "social-post-screenshot",
         "src": "assets/photos/2024-03-31-source-post.webp",
         "thumb": "assets/photos/2024-03-31-source-post.webp",
-        "width": 800,
-        "height": 870,
+        "width": 360,
+        "height": 392,
         "label": "时间来源截图"
       }
     }
