@@ -1,0 +1,281 @@
+name: Rebuild HD media
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: python -m pip install pillow
+
+      - name: Rebuild images and icons
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageDraw, ImageFont
+          from datetime import datetime, timezone, timedelta
+          import base64
+          import json
+          import re
+
+          root = Path(".")
+          photos_dir = root / "assets" / "photos"
+          data_path = root / "data" / "photos.json"
+
+          data = json.loads(data_path.read_text(encoding="utf-8"))
+          entry = data["entries"][0]
+
+          decoded = 0
+
+          # -------------------------
+          # 1. Base64 -> real WebP
+          # -------------------------
+
+          for i, photo in enumerate(entry["photos"], start=1):
+              stem = f"2024-03-31-kimono-{i:02}"
+
+              candidates = [
+                  photos_dir / f"{stem}.hd.b64",
+                  photos_dir / f"{stem}.full.b64",
+              ]
+
+              success = False
+
+              for source in candidates:
+                  if not source.exists():
+                      continue
+
+                  try:
+                      text = "".join(source.read_text(encoding="utf-8").split())
+                      raw = base64.b64decode(text, validate=True)
+
+                      # WebP must be RIFF....WEBP
+                      if raw[:4] != b"RIFF" or raw[8:12] != b"WEBP":
+                          raise ValueError("not a WebP")
+
+                      output = photos_dir / f"{stem}-hd.webp"
+                      output.write_bytes(raw)
+
+                      # Fully decode so truncated files are rejected
+                      with Image.open(output) as im:
+                          im.load()
+                          width, height = im.size
+
+                      photo["src"] = output.as_posix()
+                      photo["width"] = width
+                      photo["height"] = height
+
+                      decoded += 1
+                      success = True
+
+                      print(
+                          f"OK {stem}: "
+                          f"{width}x{height}"
+                      )
+
+                      break
+
+                  except Exception as exc:
+                      print(f"INVALID {source}: {exc}")
+
+              # Keep existing 360x540 file as thumbnail
+              if success:
+                  photo["thumb"] = f"assets/photos/{stem}.webp"
+                  photo["thumbWidth"] = 360
+                  photo["thumbHeight"] = 540
+
+                  # Remove staging files after successful decoding
+                  for candidate in candidates:
+                      if candidate.exists():
+                          candidate.unlink()
+
+          # Cover: use HD photo 03 when available
+          cover = photos_dir / "2024-03-31-kimono-03-hd.webp"
+
+          if cover.exists():
+              entry["cover"] = cover.as_posix()
+              entry["coverThumb"] = (
+                  "assets/photos/2024-03-31-kimono-03.webp"
+              )
+              entry["coverIndex"] = 2
+
+          data["updatedAt"] = datetime.now(
+              timezone(timedelta(hours=9))
+          ).isoformat(timespec="seconds")
+
+          data_path.write_text(
+              json.dumps(
+                  data,
+                  ensure_ascii=False,
+                  indent=2
+              ) + "\n",
+              encoding="utf-8"
+          )
+
+          print(f"HD decoded: {decoded}/5")
+
+          # -------------------------
+          # 2. Generate new App icon
+          # -------------------------
+
+          def make_icon(size):
+              img = Image.new(
+                  "RGB",
+                  (size, size),
+                  "#ead7de"
+              )
+
+              draw = ImageDraw.Draw(img)
+
+              margin = int(size * 0.12)
+
+              draw.rounded_rectangle(
+                  (
+                      margin,
+                      margin,
+                      size - margin,
+                      size - margin,
+                  ),
+                  radius=int(size * 0.20),
+                  fill="#f8eef1",
+              )
+
+              # Small flower
+              cx = int(size * 0.75)
+              cy = int(size * 0.27)
+              r = int(size * 0.055)
+
+              petals = [
+                  (0, -r),
+                  (r, 0),
+                  (0, r),
+                  (-r, 0),
+              ]
+
+              for dx, dy in petals:
+                  draw.ellipse(
+                      (
+                          cx + dx - r,
+                          cy + dy - r,
+                          cx + dx + r,
+                          cy + dy + r,
+                      ),
+                      fill="#ffffff",
+                  )
+
+              draw.ellipse(
+                  (
+                      cx - r // 2,
+                      cy - r // 2,
+                      cx + r // 2,
+                      cy + r // 2,
+                  ),
+                  fill="#c79c8d",
+              )
+
+              font_paths = [
+                  "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",
+                  "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+              ]
+
+              font = None
+
+              for path in font_paths:
+                  if Path(path).exists():
+                      font = ImageFont.truetype(
+                          path,
+                          int(size * 0.42)
+                      )
+                      break
+
+              if font is None:
+                  font = ImageFont.load_default()
+
+              text = "M"
+
+              bbox = draw.textbbox(
+                  (0, 0),
+                  text,
+                  font=font
+              )
+
+              w = bbox[2] - bbox[0]
+              h = bbox[3] - bbox[1]
+
+              draw.text(
+                  (
+                      (size - w) / 2,
+                      (size - h) / 2 - size * 0.035,
+                  ),
+                  text,
+                  font=font,
+                  fill="#744154",
+              )
+
+              return img
+
+          for size in (192, 512):
+              icon = make_icon(size)
+              icon.save(
+                  root / "assets" / f"icon-{size}.png",
+                  "PNG",
+                  optimize=True
+              )
+
+          # Remove abandoned icon staging file
+          staged_icon = root / "assets" / "test-icon-192.b64"
+
+          if staged_icon.exists():
+              staged_icon.unlink()
+
+          # -------------------------
+          # 3. Force PWA cache refresh
+          # -------------------------
+
+          sw_path = root / "sw.js"
+          sw = sw_path.read_text(encoding="utf-8")
+
+          sw = re.sub(
+              r"m-beauty-road-v\d+",
+              "m-beauty-road-v3",
+              sw,
+              count=1
+          )
+
+          sw_path.write_text(
+              sw,
+              encoding="utf-8"
+          )
+
+          PY
+
+      - name: Validate archive
+        run: python scripts/validate.py
+
+      - name: Commit generated assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "fix: rebuild HD photos and app icon"
+            git push
+          fi
