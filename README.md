@@ -1,47 +1,52 @@
 # M 的美女之路
 
-一个为 GitHub Pages 设计的零构建 PWA：响应式照片时间轴、可安装到手机桌面、离线缓存、照片来源与时间字段分离。
+一个为 GitHub Pages 设计的零构建静态 PWA。现在包含两个并列模块：
+
+- **美女之路**：记录 M 的造型、照片、时间、地点与来源。
+- **一起走过**：记录两个人一起旅行、约会、散步和出去玩的地方、感觉、停靠点与照片。
 
 线上地址：`https://inertia77.github.io/m-beauty-road/`
 
-## 本地预览
+## 信息架构
 
-```bash
-python -m http.server 8080
-```
+前端仍然只使用 HTML + CSS + JavaScript + JSON，不引入 React/Vue/Next 或后端。
 
-打开 `http://localhost:8080`。
+- `data/photos.json`：美女之路数据。
+- `data/journeys.json`：一起走过数据。
+- `data/journeys.schema.json`：旅程数据契约。
+- `assets/app.js`：两个模块的渲染、切换、lightbox 与 PWA 行为。
+- `assets/app.css`：统一视觉系统和移动端底部双 Tab。
 
-新增或修改数据后，先运行：
+`一起走过` 的一条 journey 可以代表一天出游，也可以代表一段多日旅行。长旅行使用 `stops` 保存多个停靠点，不需要把每个地方拆成互不相关的记录。
 
-```bash
-python scripts/validate.py
-```
+## 旅程数据原则
 
-## GitHub Pages
+旅程支持：
 
-仓库 Settings → Pages → Build and deployment → Source 选择 **Deploy from a branch**，Branch 选择 `main` + `/(root)`。
+- `startAt` / `endAt`：出行时间；不知道就保持 `null`，不要编造。
+- `location`：主要地点；经纬度 optional。
+- `stops`：一次旅程的多个停靠点。
+- `feelings`：例如「很幸福」「很舒服」「很难忘」。
+- `feeling`：一段自然语言的“这次的感觉”。
+- `favoriteMoment`：最记得的瞬间。
+- `photos`：和美女之路保持一致的 thumb / full 媒体对象，并允许单张照片自己的 `capturedAt`。
 
-## 后续照片的数据约定
+当前 `journeys.json` 故意保持为空，框架不会为了展示效果虚构真实旅行记录。
 
-每次新增记录时，在 `data/photos.json` 追加一个 entry，并把图片放入 `assets/photos/`。数据契约见 `data/photos.schema.json`。
+## 后续照片工作方式
 
-- `capturedAt`: 原图 EXIF 拍摄时间；没有就保持 `null`
-- `sourceTime`: 社交帖、聊天或人工提供的可追溯时间
-- `importedAt`: 导入这个项目的时间
-- `thumb`: 时间轴用的小图，建议约 360–480 px 宽
-- `src`: 点开大图用的较高质量 WebP；如果暂时没有单独大图，可以与 `thumb` 相同
-- `tags`, `location`, `note`: 可选整理信息
-- `source`: 时间或文字信息的来源截图/资料
+目标工作流是：
 
-时间轴优先使用 `capturedAt`，缺失时再使用 `sourceTime`，最后才使用 `importedAt`。这样不会把发帖时间或上传时间误当成拍摄时间。
+Chat 中上传照片 → 读取真实 EXIF（有则使用，没有则保持未知）→ 判断属于美女记录还是共同旅程 → 生成 thumb/full → 更新对应 JSON → validate → 提交 → Pages 更新。
 
-图片文件名按记录与序号保持不可变；如果真的替换图片，建议使用新文件名，避免旧设备的图片缓存命中旧内容。
+**媒体最终放在哪里暂未锁死。** 前端数据层只依赖 `src` / `thumb` URL，因此以后即使从 GitHub 仓库迁移到更合适的对象存储，也不需要推翻页面结构。
 
-## PWA 缓存策略
+## PWA 缓存
 
-页面、JSON、CSS 与 JavaScript 使用 network-first：在线时优先拿最新版，离线时回退缓存。照片使用 cache-first，因为照片路径按档案记录稳定，能减少重复流量并提高手机端浏览速度。
+HTML / CSS / JS / JSON 使用 network-first，在线时优先拿最新版；图片使用 stale-while-revalidate，先显示已有缓存，同时后台更新。Service Worker cache 使用有意义的版本字符串并在 activate 时清理旧的本项目 cache。
 
 ## 隐私提醒
 
-这个仓库和 GitHub Pages 当前都是 **Public**。请不要把身份证件、住址、私密聊天截图、未打码账号信息或其他不希望公开的照片提交到这里。站点带有 `noindex` 和 `robots.txt` 来降低被搜索引擎收录的概率，但这不是访问控制，也不能把 Public 内容变成私密内容。
+仓库与 GitHub Pages 当前是 **Public**。
+
+`noindex` 不是访问控制。不要提交私密聊天、住址、电话、邮箱、身份证件、未打码账号或其他不应公开的信息。来源截图尤其需要先检查敏感信息。
