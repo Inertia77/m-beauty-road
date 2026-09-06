@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "journeys.schema.json",
+  "title": "M Beauty Road journeys",
+  "type": "object",
+  "required": ["schemaVersion", "journeys"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "updatedAt": {"type": ["string", "null"], "format": "date-time"},
+    "profile": {"type": "object"},
+    "journeys": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "importedAt", "photos", "stops"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "title": {"type": "string", "minLength": 1},
+          "startAt": {"type": ["string", "null"], "format": "date-time"},
+          "endAt": {"type": ["string", "null"], "format": "date-time"},
+          "dateLabel": {"type": "string"},
+          "importedAt": {"type": "string", "format": "date-time"},
+          "location": {
+            "type": "object",
+            "properties": {
+              "name": {"type": "string"},
+              "city": {"type": "string"},
+              "country": {"type": "string"},
+              "lat": {"type": "number", "minimum": -90, "maximum": 90},
+              "lng": {"type": "number", "minimum": -180, "maximum": 180}
+            }
+          },
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "feelings": {"type": "array", "items": {"type": "string"}},
+          "feeling": {"type": "string"},
+          "favoriteMoment": {"type": "string"},
+          "note": {"type": "string"},
+          "cover": {"type": "string", "pattern": "^assets/"},
+          "coverThumb": {"type": "string", "pattern": "^assets/"},
+          "photos": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["src", "thumb", "alt", "caption"],
+              "properties": {
+                "src": {"type": "string", "pattern": "^assets/"},
+                "thumb": {"type": "string", "pattern": "^assets/"},
+                "width": {"type": "integer", "minimum": 1},
+                "height": {"type": "integer", "minimum": 1},
+                "thumbWidth": {"type": "integer", "minimum": 1},
+                "thumbHeight": {"type": "integer", "minimum": 1},
+                "capturedAt": {"type": ["string", "null"], "format": "date-time"},
+                "alt": {"type": "string"},
+                "caption": {"type": "string"}
+              }
+            }
+          },
+          "stops": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "visitedAt": {"type": ["string", "null"], "format": "date-time"},
+                "lat": {"type": "number", "minimum": -90, "maximum": 90},
+                "lng": {"type": "number", "minimum": -180, "maximum": 180},
+                "feeling": {"type": "string"},
+                "note": {"type": "string"},
+                "photoIndexes": {"type": "array", "items": {"type": "integer", "minimum": 0}}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
