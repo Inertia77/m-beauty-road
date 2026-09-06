@@ -1,124 +1,100 @@
 #!/usr/bin/env python3
-"""Validate the photo archive using only Python's standard library."""
 from __future__ import annotations
-
-import json
-import sys
+import json, sys
 from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_FILE = ROOT / "data" / "photos.json"
 errors: list[str] = []
 
+def err(msg): errors.append(msg)
+def load(name):
+    try: return json.loads((ROOT / 'data' / name).read_text(encoding='utf-8'))
+    except Exception as e: err(f'{name}: {e}'); return {}
+def iso(v, label, nullable=False):
+    if v is None and nullable: return
+    if not isinstance(v, str) or not v: return err(f'{label}: expected ISO date-time')
+    try: datetime.fromisoformat(v.replace('Z','+00:00'))
+    except ValueError: err(f'{label}: invalid ISO date-time {v}')
+def file(v, label, required=True):
+    if v is None and not required: return
+    if not isinstance(v, str) or not v.startswith('assets/') or '..' in v: return err(f'{label}: invalid asset path')
+    p = (ROOT / v).resolve()
+    try: p.relative_to(ROOT)
+    except ValueError: return err(f'{label}: escapes repository')
+    if not p.is_file(): err(f'{label}: missing {v}')
+def photo(p, label):
+    if not isinstance(p, dict): return err(f'{label}: must be object')
+    file(p.get('src'), f'{label}.src'); file(p.get('thumb'), f'{label}.thumb')
+    if p.get('capturedAt') is not None: iso(p.get('capturedAt'), f'{label}.capturedAt', True)
+    for k in ('alt','caption'):
+        if not isinstance(p.get(k), str) or not p.get(k): err(f'{label}.{k}: required')
 
-def error(message: str) -> None:
-    errors.append(message)
+def validate_beauty(d):
+    if d.get('schemaVersion') != 2: err('photos.json: schemaVersion must be 2')
+    iso(d.get('updatedAt'), 'photos.updatedAt')
+    entries = d.get('entries', [])
+    if not isinstance(entries, list): err('photos.entries: must be array'); return 0,0
+    seen=set(); count=0
+    for i,e in enumerate(entries):
+        x=f'photos.entries[{i}]'
+        if not isinstance(e,dict): err(f'{x}: must be object'); continue
+        id=e.get('id')
+        if not id: err(f'{x}.id: required')
+        elif id in seen: err(f'{x}.id: duplicate {id}')
+        else: seen.add(id)
+        iso(e.get('capturedAt'), f'{x}.capturedAt', True)
+        if e.get('sourceTime') is not None: iso(e.get('sourceTime'), f'{x}.sourceTime', True)
+        iso(e.get('importedAt'), f'{x}.importedAt')
+        file(e.get('cover'), f'{x}.cover', False); file(e.get('coverThumb'), f'{x}.coverThumb', False)
+        photos=e.get('photos', [])
+        if not isinstance(photos,list): err(f'{x}.photos: must be array'); continue
+        ci=e.get('coverIndex',0)
+        if not isinstance(ci,int) or ci<0 or (photos and ci>=len(photos)): err(f'{x}.coverIndex: invalid')
+        for j,p in enumerate(photos): photo(p, f'{x}.photos[{j}]'); count += 1
+        src=e.get('source')
+        if isinstance(src,dict): file(src.get('src'),f'{x}.source.src',False); file(src.get('thumb'),f'{x}.source.thumb',False)
+    return len(entries),count
 
-
-def valid_iso(value, label: str, *, nullable: bool = False) -> None:
-    if value is None and nullable:
-        return
-    if not isinstance(value, str) or not value:
-        error(f"{label}: expected ISO date-time string")
-        return
-    try:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        error(f"{label}: invalid ISO date-time: {value}")
-
-
-def valid_asset(value, label: str) -> None:
-    if not isinstance(value, str) or not value.startswith("assets/photos/") or ".." in value:
-        error(f"{label}: invalid local asset path: {value!r}")
-        return
-    target = (ROOT / value).resolve()
-    try:
-        target.relative_to(ROOT)
-    except ValueError:
-        error(f"{label}: asset escapes repository root")
-        return
-    if not target.is_file():
-        error(f"{label}: missing file: {value}")
-
-
-def main() -> int:
-    try:
-        data = json.loads(DATA_FILE.read_text(encoding="utf-8"))
-    except Exception as exc:
-        print(f"ERROR: cannot read {DATA_FILE}: {exc}")
-        return 1
-
-    if data.get("schemaVersion") != 2:
-        error("schemaVersion must be 2")
-    valid_iso(data.get("updatedAt"), "updatedAt")
-
-    entries = data.get("entries")
-    if not isinstance(entries, list):
-        error("entries must be an array")
-        entries = []
-
-    seen_ids: set[str] = set()
-    photo_count = 0
-    for index, entry in enumerate(entries):
-        prefix = f"entries[{index}]"
-        if not isinstance(entry, dict):
-            error(f"{prefix}: must be an object")
-            continue
-        entry_id = entry.get("id")
-        if not isinstance(entry_id, str) or not entry_id:
-            error(f"{prefix}.id: required non-empty string")
-        elif entry_id in seen_ids:
-            error(f"{prefix}.id: duplicate id {entry_id!r}")
+def validate_journeys(d):
+    if d.get('schemaVersion') != 1: err('journeys.json: schemaVersion must be 1')
+    if d.get('updatedAt') is not None: iso(d.get('updatedAt'),'journeys.updatedAt',True)
+    items=d.get('journeys',[])
+    if not isinstance(items,list): err('journeys.journeys: must be array'); return 0
+    seen=set()
+    for i,j in enumerate(items):
+        x=f'journeys.journeys[{i}]'
+        if not isinstance(j,dict): err(f'{x}: must be object'); continue
+        id=j.get('id')
+        if not id: err(f'{x}.id: required')
+        elif id in seen: err(f'{x}.id: duplicate {id}')
+        else: seen.add(id)
+        if not j.get('title'): err(f'{x}.title: required')
+        for k in ('startAt','endAt'):
+            if j.get(k) is not None: iso(j.get(k),f'{x}.{k}',True)
+        iso(j.get('importedAt'),f'{x}.importedAt')
+        file(j.get('cover'),f'{x}.cover',False); file(j.get('coverThumb'),f'{x}.coverThumb',False)
+        photos=j.get('photos',[])
+        if not isinstance(photos,list): err(f'{x}.photos: must be array')
         else:
-            seen_ids.add(entry_id)
+            for n,p in enumerate(photos): photo(p,f'{x}.photos[{n}]')
+        stops=j.get('stops',[])
+        if not isinstance(stops,list): err(f'{x}.stops: must be array')
+        else:
+            for n,s in enumerate(stops):
+                y=f'{x}.stops[{n}]'
+                if not isinstance(s,dict) or not s.get('name'): err(f'{y}.name: required')
+                elif s.get('visitedAt') is not None: iso(s.get('visitedAt'),f'{y}.visitedAt',True)
+    return len(items)
 
-        if not isinstance(entry.get("title"), str) or not entry.get("title"):
-            error(f"{prefix}.title: required non-empty string")
-        valid_iso(entry.get("capturedAt"), f"{prefix}.capturedAt", nullable=True)
-        if entry.get("sourceTime") is not None:
-            valid_iso(entry.get("sourceTime"), f"{prefix}.sourceTime", nullable=True)
-        valid_iso(entry.get("importedAt"), f"{prefix}.importedAt")
-
-        for key in ("cover", "coverThumb"):
-            if entry.get(key):
-                valid_asset(entry[key], f"{prefix}.{key}")
-
-        photos = entry.get("photos")
-        if not isinstance(photos, list):
-            error(f"{prefix}.photos: must be an array")
-            continue
-        cover_index = entry.get("coverIndex", 0)
-        if not isinstance(cover_index, int) or cover_index < 0 or (photos and cover_index >= len(photos)):
-            error(f"{prefix}.coverIndex: must point to an existing photo")
-        for photo_index, photo in enumerate(photos):
-            photo_count += 1
-            pfx = f"{prefix}.photos[{photo_index}]"
-            if not isinstance(photo, dict):
-                error(f"{pfx}: must be an object")
-                continue
-            valid_asset(photo.get("src"), f"{pfx}.src")
-            valid_asset(photo.get("thumb"), f"{pfx}.thumb")
-            for key in ("alt", "caption"):
-                if not isinstance(photo.get(key), str) or not photo.get(key):
-                    error(f"{pfx}.{key}: required non-empty string")
-
-        source = entry.get("source")
-        if isinstance(source, dict):
-            if source.get("src"):
-                valid_asset(source["src"], f"{prefix}.source.src")
-            if source.get("thumb"):
-                valid_asset(source["thumb"], f"{prefix}.source.thumb")
-
+def main():
+    b=load('photos.json'); j=load('journeys.json')
+    e,p=validate_beauty(b); n=validate_journeys(j)
     if errors:
-        print("Archive validation failed:")
-        for message in errors:
-            print(f" - {message}")
+        print('Archive validation failed:')
+        for x in errors: print(' -',x)
         return 1
-
-    print(f"Archive OK: {len(entries)} entries, {photo_count} photos, schema v2")
+    print(f'Archive OK: {e} beauty entries, {p} beauty photos, {n} journeys')
     return 0
 
-
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__': sys.exit(main())
