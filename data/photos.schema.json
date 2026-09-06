@@ -19,8 +19,8 @@
           "capturedAt": {"type": ["string", "null"], "format": "date-time"},
           "sourceTime": {"type": ["string", "null"], "format": "date-time"},
           "importedAt": {"type": "string", "format": "date-time"},
-          "cover": {"type": "string", "pattern": "^assets/photos/"},
-          "coverThumb": {"type": "string", "pattern": "^assets/photos/"},
+          "cover": {"type": "string", "pattern": "^assets/"},
+          "coverThumb": {"type": "string", "pattern": "^assets/"},
           "coverIndex": {"type": "integer", "minimum": 0},
           "photos": {
             "type": "array",
@@ -28,12 +28,15 @@
               "type": "object",
               "required": ["src", "thumb", "alt", "caption"],
               "properties": {
-                "src": {"type": "string", "pattern": "^assets/photos/"},
-                "thumb": {"type": "string", "pattern": "^assets/photos/"},
+                "src": {"type": "string", "pattern": "^assets/"},
+                "thumb": {"type": "string", "pattern": "^assets/"},
                 "alt": {"type": "string"},
                 "caption": {"type": "string"},
                 "width": {"type": "integer", "minimum": 1},
-                "height": {"type": "integer", "minimum": 1}
+                "height": {"type": "integer", "minimum": 1},
+                "thumbWidth": {"type": "integer", "minimum": 1},
+                "thumbHeight": {"type": "integer", "minimum": 1},
+                "capturedAt": {"type": ["string", "null"], "format": "date-time"}
               }
             }
           }
