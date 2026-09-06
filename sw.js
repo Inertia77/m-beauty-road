@@ -1,6 +1,8 @@
 'use strict';
 
-const CACHE = 'm-beauty-road-v2';
+const CACHE_PREFIX = 'm-beauty-road';
+const CACHE_VERSION = 'shell-2026-09-07-a';
+const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ROOT = self.registration.scope;
 const url = (path = '') => new URL(path, ROOT).href;
 const CORE = [
@@ -9,6 +11,7 @@ const CORE = [
   url('assets/app.css'),
   url('assets/app.js'),
   url('data/photos.json'),
+  url('data/journeys.json'),
   url('manifest.webmanifest'),
   url('assets/icon-192.png'),
   url('assets/icon-512.png')
@@ -21,7 +24,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith(`${CACHE_PREFIX}-`) && key !== CACHE).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -36,7 +39,7 @@ async function putIfCacheable(request, response) {
 
 async function networkFirst(request) {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-store' });
     return await putIfCacheable(request, response);
   } catch (error) {
     const cached = await caches.match(request);
@@ -49,15 +52,11 @@ async function networkFirst(request) {
   }
 }
 
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
-    const response = await fetch(request);
-    return await putIfCacheable(request, response);
-  } catch (error) {
-    return new Response('', { status: 503, statusText: 'Offline' });
-  }
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE);
+  const cached = await cache.match(request);
+  const update = fetch(request).then((response) => putIfCacheable(request, response)).catch(() => null);
+  return cached || await update || new Response('', { status: 503, statusText: 'Offline' });
 }
 
 self.addEventListener('fetch', (event) => {
@@ -66,6 +65,6 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  const isArchiveImage = request.destination === 'image' || requestUrl.pathname.includes('/assets/photos/');
-  event.respondWith(isArchiveImage ? cacheFirst(request) : networkFirst(request));
+  const isImage = request.destination === 'image' || requestUrl.pathname.includes('/assets/photos/') || requestUrl.pathname.includes('/assets/journeys/');
+  event.respondWith(isImage ? staleWhileRevalidate(request) : networkFirst(request));
 });
