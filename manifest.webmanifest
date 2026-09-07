@@ -8,12 +8,28 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#fffaf9",
-  "theme_color": "#fffaf9",
+  "background_color": "#f4e8e1",
+  "theme_color": "#f4e8e1",
   "categories": ["photo", "lifestyle", "travel"],
   "prefer_related_applications": false,
   "icons": [
-    {"src":"assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
