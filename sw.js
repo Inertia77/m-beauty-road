@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'm-beauty-road';
-const CACHE_VERSION = 'shell-2026-09-07-a';
+const CACHE_VERSION = 'shell-2026-09-07-icons-a';
 const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ROOT = self.registration.scope;
 const url = (path = '') => new URL(path, ROOT).href;
@@ -9,12 +9,17 @@ const CORE = [
   url(''),
   url('index.html'),
   url('assets/app.css'),
+  url('assets/lux.css'),
+  url('assets/interactions.css'),
   url('assets/app.js'),
+  url('assets/interactions.js'),
   url('data/photos.json'),
   url('data/journeys.json'),
   url('manifest.webmanifest'),
   url('assets/icon-192.png'),
-  url('assets/icon-512.png')
+  url('assets/icon-512.png'),
+  url('assets/apple-touch-icon-180.png'),
+  url('assets/maskable-icon-512.png')
 ];
 
 self.addEventListener('install', (event) => {
