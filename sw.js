@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'm-beauty-road';
-const CACHE_VERSION = 'shell-2026-09-07-final-a';
+const CACHE_VERSION = 'shell-2026-09-07-mobile-icon-b';
 const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ROOT = self.registration.scope;
 const url = (path = '') => new URL(path, ROOT).href;
@@ -11,6 +11,7 @@ const CORE = [
   url('assets/app.css'),
   url('assets/lux.css'),
   url('assets/interactions.css'),
+  url('assets/mobile.css'),
   url('assets/app.js'),
   url('assets/interactions.js'),
   url('data/photos.json'),
