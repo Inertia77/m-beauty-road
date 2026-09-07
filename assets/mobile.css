@@ -1,0 +1,30 @@
+/* Mobile hardening: keep every visual inside the viewport and preserve true PWA install UI. */
+html,body{max-width:100%;overflow-x:clip}
+main,.view-panel,.hero,.journey-hero,.hero-copy,.journey-copy,.hero-visual,.stats,.timeline,.journeys-section,.entries,.entry,.gallery,.meta-row,.journeys,.journey-card,.journey-card-button{min-width:0;max-width:100%}
+.hero-visual,.route-art{overflow:clip;contain:paint}
+@supports not (overflow:clip){html,body{overflow-x:hidden}.hero-visual,.route-art{overflow:hidden}}
+
+@media(max-width:900px){
+  .mobile-tabs{left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));width:auto;max-width:420px;margin-inline:auto;transform:none}
+  .topbar{max-width:100vw;overflow:clip}
+  .install-btn:not([hidden]){display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+}
+
+@media(max-width:700px){
+  .shell{width:auto;max-width:none;margin-left:max(12px,env(safe-area-inset-left));margin-right:max(12px,env(safe-area-inset-right))}
+  .hero,.journey-hero,.stats,.timeline,.journeys-section{width:auto}
+  .hero-visual{width:100%;overflow:clip}
+  .hero-card{max-width:100%}
+  .hero-ribbon-a{left:-72px}
+  .hero-ribbon-b{right:-72px}
+  .stats,.gallery{min-width:0}
+  .stat-card,.stats>div,.photo{min-width:0}
+  .mobile-tabs{left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));width:auto}
+}
+
+@media(max-width:420px){
+  .install-btn:not([hidden]){display:inline-flex!important;min-height:36px;padding:8px 10px;font-size:11px;border-radius:999px}
+  .brand-copy strong{font-size:13px}
+  .hero-ribbon-a{left:-82px}
+  .hero-ribbon-b{right:-82px}
+}
