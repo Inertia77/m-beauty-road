@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#f4e8e1" />
   <meta name="color-scheme" content="light" />
+  <meta name="application-name" content="M 的美女之路" />
   <meta name="description" content="M 的美女之路——记录她，也记录我们一起走过的地方。" />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <meta name="referrer" content="no-referrer" />
@@ -12,12 +13,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="M 的美女之路" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon-180.png" sizes="180x180" />
+  <link rel="manifest" href="manifest.webmanifest?v=20260907b" />
+  <link rel="icon" href="assets/icon-192.png?v=20260907b" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon-180.png?v=20260907b" sizes="180x180" />
   <link rel="stylesheet" href="assets/app.css" />
   <link rel="stylesheet" href="assets/lux.css" />
   <link rel="stylesheet" href="assets/interactions.css" />
+  <link rel="stylesheet" href="assets/mobile.css" />
   <title>M 的美女之路</title>
 </head>
 <body>
@@ -47,7 +49,7 @@
       </button>
     </nav>
 
-    <button id="installBtn" class="install-btn" type="button" hidden>装到桌面</button>
+    <button id="installBtn" class="install-btn" type="button" hidden>安装 App</button>
   </header>
 
   <main id="mainContent">
@@ -187,11 +189,11 @@
   <dialog id="installHelp" class="help-dialog" aria-labelledby="installTitle">
     <button id="closeInstallHelp" class="icon-btn close" type="button" aria-label="关闭">×</button>
     <p class="eyebrow">INSTALL</p>
-    <h2 id="installTitle">装到手机桌面</h2>
-    <p class="dialog-lede">装好以后，它会像一个真正的小 App 一样从主屏幕打开。</p>
+    <h2 id="installTitle">安装为独立 App</h2>
+    <p class="dialog-lede">真正安装后会以独立 App 方式启动；普通网页快捷方式可能会叠加浏览器的小标记。</p>
     <div class="help-grid">
       <div><strong>iPhone / iPad</strong><p>用 Safari 打开网站 → 点“分享” → “添加到主屏幕”。</p></div>
-      <div><strong>Android / Chrome</strong><p>打开网站后点“装到桌面”，或浏览器菜单 → “安装应用”。</p></div>
+      <div><strong>Android / Chrome</strong><p>优先点页面右上角“安装 App”，或 Chrome 菜单里的“安装应用”。不要选普通“添加到主屏幕”网页快捷方式，否则可能会带 Chrome 小标记。</p></div>
     </div>
   </dialog>
 
