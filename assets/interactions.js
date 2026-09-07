@@ -64,10 +64,23 @@
       (dx > 0 ? $('#prevPhoto') : $('#nextPhoto'))?.click();
     });
 
+    lightbox.addEventListener('pointercancel', () => { pointerStart = null; });
+
     lightbox.addEventListener('close', () => {
+      pointerStart = null;
       requestAnimationFrame(() => lightboxOpener?.focus?.({ preventScroll: true }));
     });
   }
+
+  const installHelp = $('#installHelp');
+  installHelp?.addEventListener('click', (event) => {
+    if (event.target === installHelp) installHelp.close();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    const installButton = $('#installBtn');
+    if (installButton) installButton.hidden = true;
+  });
 
   const journeys = $('#journeys');
   journeys?.addEventListener('click', (event) => {

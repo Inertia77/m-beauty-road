@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'm-beauty-road';
-const CACHE_VERSION = 'shell-2026-09-07-icons-a';
+const CACHE_VERSION = 'shell-2026-09-07-final-a';
 const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 const ROOT = self.registration.scope;
 const url = (path = '') => new URL(path, ROOT).href;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json, sys
+import json, subprocess, sys
 from datetime import datetime
 from pathlib import Path
 
@@ -95,6 +95,7 @@ def main():
         for x in errors: print(' -',x)
         return 1
     print(f'Archive OK: {e} beauty entries, {p} beauty photos, {n} journeys')
-    return 0
+    frontend = subprocess.run([sys.executable, str(ROOT / 'scripts' / 'validate_frontend.py')], check=False)
+    return frontend.returncode
 
 if __name__ == '__main__': sys.exit(main())
