@@ -170,7 +170,7 @@ def validate_javascript() -> None:
         else:
             print('Frontend / PWA note: node not found; skipped JavaScript syntax check')
         return
-    for relative in ('assets/app.js', 'assets/interactions.js'):
+    for relative in ('assets/app.js', 'assets/interactions.js', 'sw.js'):
         result = subprocess.run(
             [node, '--check', str(ROOT / relative)],
             text=True,

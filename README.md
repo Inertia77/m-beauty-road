@@ -68,10 +68,28 @@ Chat 中上传照片 → 读取真实 EXIF（有则使用，没有则保持未�
 
 ## PWA 缓存
 
-HTML / CSS / JS / JSON 使用 network-first，在线时优先拿最新版；图片使用 stale-while-revalidate，先显示已有缓存，同时后台更新。Service Worker cache 使用有意义的版本字符串并在 activate 时清理旧的本项目 cache。
+HTML / CSS / JS / JSON 使用 network-first，在线时优先拿最新版；照片采用独立 cache-first 缓存，JSON 也与页面缓存分离；更换照片内容必须使用新的文件名。升级页面不再清除新版独立媒体缓存。首次迁移旧缓存时可能需要联网重新加载照片。
 
 ## 隐私提醒
 
 仓库与 GitHub Pages 当前是 **Public**。
 
 `noindex` 不是访问控制。不要提交私密聊天、住址、电话、邮箱、身份证件、未打码账号或其他不应公开的信息。来源截图尤其需要先检查敏感信息。
+
+## 媒体导入（本地或开发环境）
+
+先确认照片允许公开，原图保存在仓库之外。安装 Pillow：
+
+    python -m pip install Pillow
+    python scripts/process_media.py --module beauty --approved-public /path/to/photo.jpg
+
+脚本生成内容哈希命名的 WebP 大图与缩略图、剥离 EXIF/GPS，并输出可合并到对应 JSON 的媒体对象。旅程使用 --module journeys。照片说明请人工补齐；脚本只在真实 EXIF 同时具有拍摄时间与时区时写入 capturedAt，否则保持未知，不自动公开或提交文件。运行 python scripts/validate.py 后再提交。低分辨率原图不会被放大。
+
+旅程展开后支持全部照片、灯箱浏览及停靠点照片关联。正式数据仍不得虚构。
+
+完整校验依赖：
+
+    python -m pip install Pillow jsonschema
+    python scripts/validate.py
+
+安装依赖后会额外检查 JSON Schema、媒体可解码性和实际尺寸。浏览器回归测试使用测试专用旅程，不写入正式数据。
