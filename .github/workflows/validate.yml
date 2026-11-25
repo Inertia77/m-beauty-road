@@ -1,13 +1,10 @@
 name: Validate archive
-
 on:
   push:
     branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -16,5 +13,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate beauty and journey data
+      - name: Install validation dependencies
+        run: python -m pip install Pillow jsonschema playwright
+      - name: Validate archive data and media
         run: python scripts/validate.py
+      - name: Install test browser
+        run: python -m playwright install --with-deps chromium
+      - name: Browser regression
+        run: python scripts/test_browser.py

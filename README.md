@@ -86,3 +86,10 @@ HTML / CSS / JS / JSON 使用 network-first，在线时优先拿最新版；照�
 脚本生成内容哈希命名的 WebP 大图与缩略图、剥离 EXIF/GPS，并输出可合并到对应 JSON 的媒体对象。旅程使用 --module journeys。照片说明请人工补齐；脚本不猜测拍摄日期，不自动公开或提交文件。运行 python scripts/validate.py 后再提交。低分辨率原图不会被放大。
 
 旅程展开后支持全部照片、灯箱浏览及停靠点照片关联。正式数据仍不得虚构。
+
+完整校验依赖：
+
+    python -m pip install Pillow jsonschema
+    python scripts/validate.py
+
+安装依赖后会额外检查 JSON Schema、媒体可解码性和实际尺寸。浏览器回归测试使用测试专用旅程，不写入正式数据。
