@@ -83,7 +83,7 @@ HTML / CSS / JS / JSON 使用 network-first，在线时优先拿最新版；照�
     python -m pip install Pillow
     python scripts/process_media.py --module beauty --approved-public /path/to/photo.jpg
 
-脚本生成内容哈希命名的 WebP 大图与缩略图、剥离 EXIF/GPS，并输出可合并到对应 JSON 的媒体对象。旅程使用 --module journeys。照片说明请人工补齐；脚本不猜测拍摄日期，不自动公开或提交文件。运行 python scripts/validate.py 后再提交。低分辨率原图不会被放大。
+脚本生成内容哈希命名的 WebP 大图与缩略图、剥离 EXIF/GPS，并输出可合并到对应 JSON 的媒体对象。旅程使用 --module journeys。照片说明请人工补齐；脚本只在真实 EXIF 同时具有拍摄时间与时区时写入 capturedAt，否则保持未知，不自动公开或提交文件。运行 python scripts/validate.py 后再提交。低分辨率原图不会被放大。
 
 旅程展开后支持全部照片、灯箱浏览及停靠点照片关联。正式数据仍不得虚构。
 

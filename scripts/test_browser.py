@@ -39,7 +39,7 @@ with ThreadingHTTPServer(('127.0.0.1',0),handler) as server:
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), 'horizontal overflow'
         page.unroute('**/data/journeys.json')
         page.route('**/data/journeys.json',lambda route:route.fulfill(status=503,body='Unavailable'))
-        page.goto(url+'#journeys')
+        page.goto(url+'?test=error#journeys')
         expect(page.locator('#journeys .error-state')).to_be_visible()
         assert not errors, errors
         browser.close()

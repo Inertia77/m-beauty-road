@@ -50,7 +50,7 @@ async function networkFirst(request, isData) {
     if (response.ok) return save(cache, request, response);
     if (response.status !== 429 && response.status < 500) return response;
   } catch (_) {}
-  const cached = await cache.match(request) || (isData ? await (await caches.open(CACHE)).match(request) : null);
+  const cached = await cache.match(request) || (isData ? await (await caches.open(CACHE)).match(request) : await cache.match(request, {ignoreSearch: true}));
   if (cached) return cached;
   if (request.mode === 'navigate') {
     const shell = await cache.match(url('index.html'));

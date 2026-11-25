@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import io
 import json
+from datetime import datetime
 from pathlib import Path
 from PIL import Image, ImageOps
 
@@ -14,6 +15,14 @@ def process(path, module):
     directory.mkdir(parents=True, exist_ok=True)
     with Image.open(path) as source:
         source.load()
+        captured = None
+        try:
+            exif = source.getexif().get_ifd(34665)
+            timestamp, offset = exif.get(36867), exif.get(36881)
+            if timestamp and offset:
+                captured = datetime.strptime(timestamp + offset, '%Y:%m:%d %H:%M:%S%z').isoformat()
+        except (ValueError, TypeError, AttributeError):
+            pass
         original = ImageOps.exif_transpose(source).convert('RGB')
     def variant(limit, quality):
         image = original.copy()
@@ -36,7 +45,7 @@ def process(path, module):
         thumb,tw,th = full,w,h
     else:
         thumb,tw,th = variant(640, 82)
-    return dict(src=full,thumb=thumb,width=w,height=h,thumbWidth=tw,thumbHeight=th,alt='',caption='',capturedAt=None)
+    return dict(src=full,thumb=thumb,width=w,height=h,thumbWidth=tw,thumbHeight=th,alt='',caption='',capturedAt=captured)
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
