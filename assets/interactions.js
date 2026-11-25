@@ -1,104 +1,30 @@
 'use strict';
-
+// Supplemental keyboard and pointer interactions; app.js owns all application state.
 (() => {
-  const $ = (s) => document.querySelector(s);
-  const $$ = (s) => [...document.querySelectorAll(s)];
-  const scrollByView = { beauty: 0, journeys: 0 };
-  let activeView = location.hash === '#journeys' ? 'journeys' : 'beauty';
-  let lightboxOpener = null;
-  let pointerStart = null;
-
-  function syncTabs(view = activeView) {
-    activeView = view === 'journeys' ? 'journeys' : 'beauty';
-    document.body.dataset.view = activeView;
-    $$('[data-view-target]').forEach((button) => {
-      const on = button.dataset.viewTarget === activeView;
-      button.setAttribute('aria-current', on ? 'page' : 'false');
-      if (button.classList.contains('mobile-tab')) button.tabIndex = on ? 0 : -1;
-    });
-  }
-
-  syncTabs();
-
-  $$('[data-view-target]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const next = button.dataset.viewTarget === 'journeys' ? 'journeys' : 'beauty';
-      if (next === activeView) return;
-      scrollByView[activeView] = window.scrollY;
-      activeView = next;
-      syncTabs(next);
-      requestAnimationFrame(() => window.scrollTo({ top: scrollByView[next] || 0, behavior: 'auto' }));
-    });
-  });
-
-  window.addEventListener('hashchange', () => syncTabs(location.hash === '#journeys' ? 'journeys' : 'beauty'));
-
-  const entries = $('#entries');
-  if (entries) {
-    entries.addEventListener('click', (event) => {
-      const opener = event.target.closest('[data-entry][data-index],[data-source]');
-      if (opener) lightboxOpener = opener;
-    }, true);
-  }
-
-  const hero = $('#heroCard');
-  hero?.addEventListener('click', () => { lightboxOpener = hero; }, true);
-
+  const $ = s => document.querySelector(s);
   const lightbox = $('#lightbox');
-  if (lightbox) {
-    lightbox.addEventListener('click', (event) => {
-      if (event.target === lightbox) lightbox.close();
-    });
-
-    lightbox.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'touch') return;
-      pointerStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
-    });
-
-    lightbox.addEventListener('pointerup', (event) => {
-      if (!pointerStart || pointerStart.id !== event.pointerId) return;
-      const dx = event.clientX - pointerStart.x;
-      const dy = event.clientY - pointerStart.y;
-      pointerStart = null;
-      if (Math.abs(dx) < 55 || Math.abs(dx) <= Math.abs(dy) * 1.2) return;
-      (dx > 0 ? $('#prevPhoto') : $('#nextPhoto'))?.click();
-    });
-
-    lightbox.addEventListener('pointercancel', () => { pointerStart = null; });
-
-    lightbox.addEventListener('close', () => {
-      pointerStart = null;
-      requestAnimationFrame(() => lightboxOpener?.focus?.({ preventScroll: true }));
-    });
-  }
-
-  const installHelp = $('#installHelp');
-  installHelp?.addEventListener('click', (event) => {
-    if (event.target === installHelp) installHelp.close();
+  let pointer = null;
+  lightbox.addEventListener('click', e => { if(e.target === lightbox) lightbox.close(); });
+  lightbox.addEventListener('pointerdown', e => {
+    if(e.pointerType !== 'touch' && e.button === 0 && !e.target.closest('button')) pointer={id:e.pointerId,x:e.clientX,y:e.clientY};
   });
-
-  window.addEventListener('appinstalled', () => {
-    const installButton = $('#installBtn');
-    if (installButton) installButton.hidden = true;
+  lightbox.addEventListener('pointerup', e => {
+    if(!pointer || pointer.id !== e.pointerId) return;
+    const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;
+    pointer=null;
+    if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.2) $(dx>0?'#prevPhoto':'#nextPhoto').click();
   });
-
-  const journeys = $('#journeys');
-  journeys?.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-journey]');
-    if (!button) return;
-    requestAnimationFrame(() => {
-      const detail = document.querySelector(`[data-detail="${CSS.escape(button.dataset.journey || '')}"]`);
-      button.setAttribute('aria-expanded', detail && !detail.hidden ? 'true' : 'false');
-    });
-  });
-
-  $('.mobile-tabs')?.addEventListener('keydown', (event) => {
-    if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-    const tabs = $$('.mobile-tab');
-    const current = Math.max(0, tabs.indexOf(document.activeElement));
-    const next = (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-    event.preventDefault();
-    tabs[next]?.focus();
-    tabs[next]?.click();
+  lightbox.addEventListener('pointercancel', () => {pointer=null;});
+  lightbox.addEventListener('close', () => {pointer=null;});
+  const help=$('#installHelp');
+  help.addEventListener('click', e => {if(e.target===help)help.close();});
+  $('.mobile-tabs')?.addEventListener('keydown', e => {
+    if(!['ArrowLeft','ArrowRight'].includes(e.key))return;
+    const tabs=[...document.querySelectorAll('.mobile-tab')];
+    const i=tabs.indexOf(document.activeElement);
+    if(i<0)return;
+    e.preventDefault();
+    const next=tabs[(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];
+    next.focus();next.click();
   });
 })();

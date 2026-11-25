@@ -1,8 +1,10 @@
 'use strict';
 
 const CACHE_PREFIX = 'm-beauty-road';
-const CACHE_VERSION = 'shell-2026-09-07-mobile-icon-b';
+const CACHE_VERSION = 'shell-2026-11-25-stability';
 const CACHE = `${CACHE_PREFIX}-${CACHE_VERSION}`;
+const MEDIA = `${CACHE_PREFIX}-media-v1`;
+const DATA = `${CACHE_PREFIX}-data-v1`;
 const ROOT = self.registration.scope;
 const url = (path = '') => new URL(path, ROOT).href;
 const CORE = [
@@ -30,47 +32,46 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key.startsWith(`${CACHE_PREFIX}-`) && key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key.startsWith(`${CACHE_PREFIX}-`) && ![CACHE, MEDIA, DATA].includes(key)).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
 
-async function putIfCacheable(request, response) {
-  if (response?.ok && response.type !== 'opaque') {
-    const cache = await caches.open(CACHE);
-    await cache.put(request, response.clone());
+async function save(cache, request, response) {
+  if (response.ok && response.type !== 'opaque') {
+    try { await cache.put(request, response.clone()); } catch (e) { console.warn('Cache write failed', e); }
   }
   return response;
 }
-
-async function networkFirst(request) {
+async function networkFirst(request, isData) {
+  const cache = await caches.open(isData ? DATA : CACHE);
   try {
     const response = await fetch(request, { cache: 'no-store' });
-    return await putIfCacheable(request, response);
-  } catch (error) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    if (request.mode === 'navigate') {
-      const shell = await caches.match(url('index.html'));
-      if (shell) return shell;
-    }
-    return new Response('Offline', { status: 503, statusText: 'Offline' });
+    if (response.ok) return save(cache, request, response);
+    if (response.status !== 429 && response.status < 500) return response;
+  } catch (_) {}
+  const cached = await cache.match(request) || (isData ? await (await caches.open(CACHE)).match(request) : null);
+  if (cached) return cached;
+  if (request.mode === 'navigate') {
+    const shell = await cache.match(url('index.html'));
+    if (shell) return shell;
   }
+  return new Response('Offline or unavailable', { status: 503 });
 }
-
-async function staleWhileRevalidate(request) {
-  const cache = await caches.open(CACHE);
+async function mediaFirst(request) {
+  const cache = await caches.open(MEDIA);
   const cached = await cache.match(request);
-  const update = fetch(request).then((response) => putIfCacheable(request, response)).catch(() => null);
-  return cached || await update || new Response('', { status: 503, statusText: 'Offline' });
+  if (cached) return cached;
+  try { return await save(cache, request, await fetch(request)); }
+  catch (_) { return new Response('', {status:503}); }
 }
-
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
-  const requestUrl = new URL(request.url);
-  if (requestUrl.origin !== self.location.origin) return;
-
-  const isImage = request.destination === 'image' || requestUrl.pathname.includes('/assets/photos/') || requestUrl.pathname.includes('/assets/journeys/');
-  event.respondWith(isImage ? staleWhileRevalidate(request) : networkFirst(request));
+  const target = new URL(request.url);
+  if (target.origin !== self.location.origin || !target.href.startsWith(ROOT)) return;
+  const path = target.pathname;
+  const isMedia = path.includes('/assets/photos/') || path.includes('/assets/journeys/');
+  const isData = path.includes('/data/') && path.endsWith('.json');
+  event.respondWith(isMedia ? mediaFirst(request) : networkFirst(request, isData));
 });
