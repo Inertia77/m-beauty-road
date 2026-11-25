@@ -67,7 +67,7 @@ function setView(view, writeHash = true) {
   document.body.dataset.view = next;
   $('#beautyView').hidden = next !== 'beauty';
   $('#journeyView').hidden = next !== 'journeys';
-  $('[data-view-target]').forEach(btn => {
+  $$('[data-view-target]').forEach(btn => {
     const on = btn.dataset.viewTarget === next;
     btn.classList.toggle('is-active', on);
     btn.setAttribute('aria-pressed', String(on));
@@ -194,7 +194,7 @@ $('#journeys').addEventListener('click', e => {
   if (p) return openJourney(p.dataset.journeyPhoto, Number(p.dataset.index));
   const b = e.target.closest('[data-journey]');
   if (!b) return;
-  const d = $( '[data-detail]' ).find(el => el.dataset.detail === b.dataset.journey);
+  const d = $$( '[data-detail]' ).find(el => el.dataset.detail === b.dataset.journey);
   if (d) { d.hidden = !d.hidden; b.setAttribute('aria-expanded', String(!d.hidden)); }
 });
 $('#heroCard').addEventListener('click', e => openBeauty(e.currentTarget.dataset.entry, Number(e.currentTarget.dataset.index || 0)));
