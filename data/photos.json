@@ -29,20 +29,20 @@
         {
           "src": "assets/photos/2024-03-31-kimono-01.webp",
           "thumb": "assets/photos/2024-03-31-kimono-01.webp",
-          "width": 360,
-          "height": 540,
-          "thumbWidth": 360,
-          "thumbHeight": 540,
+          "width": 480,
+          "height": 720,
+          "thumbWidth": 480,
+          "thumbHeight": 720,
           "alt": "粉色振袖，寺社建筑与五重塔背景",
           "caption": "回望 · 寺社街景"
         },
         {
           "src": "assets/photos/2024-03-31-kimono-02.webp",
           "thumb": "assets/photos/2024-03-31-kimono-02.webp",
-          "width": 360,
-          "height": 540,
-          "thumbWidth": 360,
-          "thumbHeight": 540,
+          "width": 480,
+          "height": 720,
+          "thumbWidth": 480,
+          "thumbHeight": 720,
           "alt": "粉色振袖，御神签处近景",
           "caption": "御神签 · 侧颜"
         },
